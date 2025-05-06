@@ -1,11 +1,11 @@
 class Ray {
-  constructor(ctx, x, y, angle, quantRays) {
+  constructor(ctx, x, y, angle, quantRays, fov) {
     this.ctx = ctx;
     this.width = 0.5;
 
     this.size = 0;
 
-    this.angle = angle * 360 / quantRays;
+    this.angle = angle * fov / quantRays;
 
     this.radians = this.angle * Math.PI / 180;
 

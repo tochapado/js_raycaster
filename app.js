@@ -1,31 +1,38 @@
-const canvas = document.querySelector('#canvas');
+const canvas1 = document.querySelector('#canvas1');
+const canvas2 = document.querySelector('#canvas2');
 
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
+canvas1.height = window.innerHeight / 2;
+canvas1.width = window.innerWidth;
 
-const ctx = canvas.getContext('2d');
+const ctx1 = canvas1.getContext('2d');
+
+canvas2.height = window.innerHeight / 2;
+canvas2.width = window.innerWidth;
+
+const ctx2 = canvas2.getContext('2d');
 
 const diagonal = Math.sqrt(
-  Math.pow(canvas.width, 2) +
-  Math.pow(canvas.height, 2)
+  Math.pow(canvas1.width, 2) +
+  Math.pow(canvas1.height, 2)
 );
 
 const quant = {
-  obstacles: 5,
-  rays: 1337,
+  obstacles: 3,
+  rays: 500,
+  fov: 45,
 };
 
 const obstacles = [];
 
 for(let i = 0; i < quant.obstacles; i++) {
-  const obstacle = new Obstacle(ctx);
+  const obstacle = new Obstacle(ctx1);
   obstacles.push(obstacle);
 };
 
 const rays = [];
 
 for(let i = 0; i < quant.rays; i++) {
-  const ray = new Ray(ctx, 0, 0, i, quant.rays);
+  const ray = new Ray(ctx1, 0, 0, i, quant.rays, quant.fov);
 
   ray.size = diagonal;
   rays.push(ray);
@@ -66,7 +73,7 @@ function collision(ray, obstacle) {
 
 };
 
-canvas.addEventListener('mousemove', function(e) {
+canvas1.addEventListener('mousemove', function(e) {
   const x = e.clientX;
   const y = e.clientY;
 
@@ -79,7 +86,8 @@ canvas.addEventListener('mousemove', function(e) {
 });
 
 function animate(timestamp) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+  ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
 
   for(let i = 0; i < obstacles.length; i++) {
     obstacles[i].render();
@@ -96,6 +104,12 @@ function animate(timestamp) {
     ray.finalPoint = ray.changeFinal();
 
     ray.render();
+
+    const width = canvas2.width / rays.length;
+    const height = canvas2.height * (1 - ray.size / diagonal);
+
+    ctx2.fillStyle = `hsl(0deg, 0%, ${100 * (1 - ray.size / diagonal)}%)`;
+    ctx2.fillRect(i * width, (canvas2.height - height) / 2, width, height);
   };
 
   requestAnimationFrame(animate);
